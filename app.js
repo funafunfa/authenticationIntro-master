@@ -4,6 +4,25 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
+var cors = require('cors');
+var auth = require('./routes/auth');
+var book = require('./routes/books');
+app.use(cors());
+app.use(function (req, res, next) {
+
+    // Website you wish to allow to connect
+    // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
+    // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3002');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
+    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
+
+    // Pass to next layer of middleware
+    next();
+});
+
+
 
 //connect to MongoDB
 mongoose.connect('mongodb://localhost/testForAuthSSS');
@@ -24,19 +43,7 @@ app.use(session({
     mongooseConnection: db
   })
 }));
-app.use(function (req, res, next) {
 
-    // Website you wish to allow to connect
-    // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
-    // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3002');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
-    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
-
-    // Pass to next layer of middleware
-    next();
-});
 // app.use(function (req, res, next) {
 //
 //     // Website you wish to allow to connect
@@ -63,7 +70,8 @@ app.use(function (req, res, next) {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-
+app.use('/api/auth', auth);
+app.use('/api/book', book);
 // serve static files from template
 app.use(express.static(__dirname + '/templateLogReg'));
 
